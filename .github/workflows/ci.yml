@@ -34,8 +34,6 @@ jobs:
       - name: Run Test
         shell: bash
         run: |
-          # Windows needs help finding coursier installed apps
-          #export PATH=$COURSIER_BIN_DIR:$PATH
           # First run of mill is important to set itself up
           ./mill resolve _
           scala-cli${{ matrix.ext }} test.sc -- ${{ matrix.os }}
