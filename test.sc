@@ -1,4 +1,4 @@
-#!/usr/bin/env -S scala-cli shebang --scala-version 2.13
+//> using scala 2.13
 //> using dep "com.lihaoyi::os-lib:0.9.1"
 
 // Useful constants

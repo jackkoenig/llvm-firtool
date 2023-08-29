@@ -15,10 +15,13 @@ jobs:
         include:
           - runner: ubuntu-20.04
             os: linux
+            ext: ""
           - runner: macos-11
             os: macos
+            ext: ""
           - runner: windows-2019
             os: windows
+            ext: ".bat"
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -35,5 +38,5 @@ jobs:
           export PATH=$COURSIER_BIN_DIR:$PATH
           ls $COURSIER_BIN_DIR
           env
-          ./test.sc ${{ matrix.os }}
+          scala-cli${{ matrix.ext }} test.sc ${{ matrix.os }}
 
