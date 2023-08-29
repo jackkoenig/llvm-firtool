@@ -5,6 +5,9 @@ import scalalib._
 import publish._
 import mill.util.Jvm
 
+import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
+import io.kipp.mill.ci.release.{CiReleaseModule, SonatypeHost}
+
 case class Platform(os: String, arch: String) {
   override def toString: String = s"$os-$arch"
 }
@@ -14,23 +17,20 @@ object Platform {
   implicit val rw: ReadWriter[Platform] = macroRW
 }
 
-// Release SNAPSHOT with:
-// mill mill.scalalib.PublishModule/publishAll llvm-firtool.publishArtifacts $SONATYPE_USERNAME:$SONATYPE_PASSWORD --sonatypeSnapshotUri https://s01.oss.sonatype.org/content/repositories/snapshots --signed false --release false
-// See docs: https://mill-build.com/mill/Scala_Build_Examples.html#_publish_module
-object `llvm-firtool` extends JavaModule with PublishModule {
+object `llvm-firtool` extends JavaModule with CiReleaseModule {
 
-  def firtoolVersion = "1.52.0"
-  // FNDDS requires that the publish version start with firtool version with optional -<suffix>
-  def publishSuffix = "-SNAPSHOT"
-  require(publishSuffix.headOption.forall(_ == '-'), s"suffix must start with -, got '$publishSuffix'")
-  def publishVersion = firtoolVersion + publishSuffix
-
-  private def FNDDSSpecVersion = "1.0.0"
-  private def groupId = "org.chipsalliance"
+  def FNDDSSpecVersion = "1.0.0"
+  def groupId = "org.chipsalliance"
   // artifactId is the the name of this object
-  private def artId = "llvm-firtool"
-  private def binName = "firtool"
-  private def releaseUrl = s"https://github.com/llvm/circt/releases/download/firtool-${firtoolVersion}"
+  def artId = "llvm-firtool"
+  def binName = "firtool"
+  def releaseUrl = T {
+    val firtoolVersion = publishVersion().split('-').head
+    s"https://github.com/llvm/circt/releases/download/firtool-${firtoolVersion}"
+  }
+
+  // org.chipsalliance is published at s01.sonatype
+  override def sonatypeHost = Some(SonatypeHost.s01)
 
   val platforms = Seq[Platform](
     Platform("macos", "x64"),
@@ -59,7 +59,7 @@ object `llvm-firtool` extends JavaModule with PublishModule {
       } else {
         s"firrtl-bin-$platform.tar.gz"
       }
-      val archiveUrl = s"$releaseUrl/$tarballName"
+      val archiveUrl = s"${releaseUrl()}/$tarballName"
       val file = T.dest / tarballName
       os.write(file, requests.get.stream(archiveUrl))
       platform -> PathRef(file)
