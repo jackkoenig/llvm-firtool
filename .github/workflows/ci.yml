@@ -38,5 +38,5 @@ jobs:
           export PATH=$COURSIER_BIN_DIR:$PATH
           ls $COURSIER_BIN_DIR
           env
-          scala-cli${{ matrix.ext }} test.sc ${{ matrix.os }}
+          scala-cli${{ matrix.ext }} test.sc -- ${{ matrix.os }}
 
