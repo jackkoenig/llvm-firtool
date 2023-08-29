@@ -1,4 +1,4 @@
-#!/usr/bin/env -S scala-cli shebang --scala-version 2.13
+//> using scala 2.13
 //> using dep "com.lihaoyi::os-lib:0.9.1"
 
 // Useful constants
@@ -16,13 +16,13 @@ if (args.size != 1) {
 val platform = args(0)
 
 // Get version
-val getVersion = os.proc("./mill", "show", "llvm-firtool.publishVersion").call(cwd = os.pwd)
+val getVersion = os.proc("sh", "mill", "show", "llvm-firtool.publishVersion").call(cwd = os.pwd)
 val publishVersion = getVersion.out.trim().stripPrefix("\"").stripSuffix("\"")
 val firtoolVersion = publishVersion.split('-').head // Remove any -suffix
 
 // Do publish local
 val repo = os.pwd / "test-repo"
-os.proc("./mill", "llvm-firtool.publishM2Local", repo).call(cwd = os.pwd)
+os.proc("sh", "mill", "llvm-firtool.publishM2Local", repo).call(cwd = os.pwd)
 
 val publishDir = repo / "org" / "chipsalliance" / "llvm-firtool" / publishVersion
 
