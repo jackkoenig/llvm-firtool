@@ -19,6 +19,15 @@ object Platform {
 
 object `llvm-firtool` extends JavaModule with CiReleaseModule {
 
+  // This cannot be cached in case user changes the environment variable
+  override def publishVersion = T.command {
+    // We can't use the default VcsVersion because we can have multiple tags on the same commit
+    val versionOpt = sys.env.get("LLVM_FIRTOOL_VERSION")
+    require(versionOpt.exists(_.nonEmpty), "Version must be set in environment variable LLVM_FIRTOOL_VERSION")
+    println(versionOpt)
+    versionOpt.get.stripPrefix("v") // Tags have a leading v
+  }
+
   def FNDDSSpecVersion = "1.0.0"
   def groupId = "org.chipsalliance"
   // artifactId is the the name of this object
