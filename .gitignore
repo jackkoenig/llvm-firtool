@@ -1,0 +1,8 @@
+/out
+*.swp
+/.bsp
+/.scala-build
+
+# Testing outputs
+/test-repo
+/firtool-test*
