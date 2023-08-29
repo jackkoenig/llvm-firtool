@@ -1,0 +1,35 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  ci:
+    name: Run Tests
+    strategy:
+      matrix:
+        runner: ["ubuntu-20.04", "macos-11", "windows-2019"]
+        include:
+          - runner: ubuntu-20.04
+            os: linux
+          - runner: macos-11
+            os: macos
+          - runner: windows-2019
+            os: windows
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Scala and Scala-CLI
+        uses: coursier/setup-action@v1
+        with:
+          jvm: adopt:11
+          apps: scala-cli
+      - name: Run Test
+        shell: bash
+        run: |
+          ./test.sc ${{ matrix.os }}
+
